@@ -2,6 +2,10 @@
 
 Browser-based artificial life simulation built with TypeScript and Vite. Entities are made of colored line segments (Photosynth, Locomotor, Neural, Attack, Armor) and evolve through mutation and natural selection. Inspired by Primorial Life.
 
+## Try it out
+
+https://plhosk.github.io/alife/
+
 ## What it does
 
 - Simulates populations of autonomous entities in a wrapped 2D world.
