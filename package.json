@@ -1,0 +1,31 @@
+{
+  "name": "alife",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "check": "echo tsc: && tsc --noEmit && echo eslint: && eslint",
+    "build": "tsc && vite build",
+    "preview": "npm run build && vite preview --host",
+    "analysis:summary": "tsx src/cli/analysis-summary.ts",
+    "analysis:merge-shards": "node scripts/merge-shard-exports.mjs",
+    "analysis:sensitivity": "node scripts/sensitivity-analysis.mjs",
+    "automation:run-shards-12d": "bash scripts/run-sharded-chromium-ecosystem-axes-12d.sh",
+    "experiment:saltelli": "node scripts/saltelli-experiment.mjs",
+    "analysis:saltelli": "node scripts/saltelli-analysis.mjs"
+  },
+  "devDependencies": {
+    "@eslint/css": "^0.14.1",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.3",
+    "eslint": "^10.0.2",
+    "globals": "^17.3.0",
+    "jszip": "^3.10.1",
+    "lobos": "^0.10.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^7.3.1",
+    "vite-plugin-singlefile": "^2.3.0"
+  }
+}

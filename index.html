@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A-Life Simulator</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <div id="main">
+      <canvas id="canvas"></canvas>
+      <div id="panelDock">
+        <div id="automationPanel" class="panel-collapsed">
+          <div class="automation-content">
+            <div class="automation-header pane">
+              <h2>Automation</h2>
+              <button id="closeAutomation" class="close-btn icon-placeholder"></button>
+            </div>
+            
+            <div class="automation-section pane">
+              <h3>Automation preset</h3>
+              <select id="presetSelect">
+                <option value="" selected disabled>Select an automation preset...</option>
+              </select>
+              <div id="presetDescription" class="preset-description"></div>
+              <div id="presetSummary" class="preset-summary"></div>
+              <textarea id="presetParameters" class="settings-preset-preview automation-preset-preview" readonly></textarea>
+            </div>
+            
+            <div class="automation-section pane">
+              <h3>Progress</h3>
+              <div>
+                <div class="progress-bar">
+                  <div class="progress-bar-fill" id="automationProgressFill"></div>
+                </div>
+                <div class="progress-text-container">
+                  <div class="progress-text" id="automationProgressText">Not started</div>
+                  <div class="progress-text" id="automationProgressTextRight"></div>
+                </div>
+              </div>
+              <div id="currentExperimentInfo" class="current-experiment-info">
+                <div class="experiment-detail"><span>Experiment:</span> <span id="currentExpId">--</span></div>
+                <div class="experiment-detail"><span>Seed:</span> <span id="currentExpSeeds">--</span></div>
+                <div class="experiment-detail"><span>Time:</span> <span id="currentExpTime">--</span></div>
+                <div class="experiment-detail"><span>Population:</span> <span id="currentExpPop">--</span></div>
+                <div class="experiment-detail"><span>Step time:</span> <span id="currentExpDt">--</span></div>
+                <div class="experiment-detail"><span>Steps per frame:</span> <span id="currentExpSpeed">--</span></div>
+              </div>
+            </div>
+            
+            <div class="automation-section pane">
+              <h3>Downloads</h3>
+              <div class="download-rows">
+                <div class="download-row">
+                  <span class="download-label">Results <span class="download-ext">(.json)</span></span>
+                  <button id="downloadResults" disabled><span class="btn-text">All</span><span class="btn-count" id="resultsCount">0</span></button>
+                </div>
+                <div class="download-row">
+                  <span class="download-label">Census <span class="download-ext">(.jsonl)</span></span>
+                  <button id="downloadCensus" disabled><span class="btn-text">All</span><span class="btn-count" id="censusCount">0</span></button>
+                  <button id="downloadFinalCensus" disabled><span class="btn-text">Final</span><span class="btn-count" id="finalCensusCount">0</span></button>
+                </div>
+                <div class="download-row">
+                  <span class="download-label">Mosaic <span class="download-ext">(.zip)</span></span>
+                  <button id="downloadMosaic" disabled><span class="btn-text">All</span><span class="btn-count" id="mosaicCount">0</span></button>
+                  <button id="downloadFinalMosaic" disabled><span class="btn-text">Final</span><span class="btn-count" id="finalMosaicCount">0</span></button>
+                </div>
+                <div class="download-row">
+                  <span class="download-label">Screenshots <span class="download-ext">(.zip)</span></span>
+                  <button id="downloadScreenshots" disabled><span class="btn-text">All</span><span class="btn-count" id="screenshotsCount">0</span></button>
+                  <button id="downloadFinalScreenshots" disabled><span class="btn-text">Final</span><span class="btn-count" id="finalScreenshotsCount">0</span></button>
+                </div>
+                <div class="download-row">
+                  <span class="download-label">Analysis <span class="download-ext">(.json)</span></span>
+                  <button id="downloadAnalysis" disabled><span class="btn-text">Generate</span><span class="btn-count" id="analysisCount">0</span></button>
+                  <button id="downloadAnalysisSummary" disabled><span class="btn-text">Summary</span></button>
+                </div>
+              </div>
+              <button id="downloadAll" class="download-all-btn" disabled>Download all</button>
+              <div id="downloadProgress" class="download-progress hidden">
+                <div class="download-progress-bar">
+                  <div class="download-progress-fill" id="downloadProgressFill"></div>
+                </div>
+                <div class="download-progress-text" id="downloadProgressText">Preparing...</div>
+              </div>
+            </div>
+            
+            <div class="automation-actions pane">
+              <button id="toggleAutomation" class="success">Start</button>
+            </div>
+          </div>
+        </div>
+        <div id="helpPanel" class="panel-collapsed">
+          <div id="infoPaneContent">
+            <div class="pane help-panel-header">
+              <div class="slider-panel-header">
+                <h2>Help</h2>
+                <div class="slider-panel-header-actions">
+                  <button id="closeHelpPanel" class="close-btn icon-placeholder"></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Segment Types</h2>
+              <div class="info-section">
+                <div class="legend-item">
+                  <span class="legend-color" data-segment="Pho"></span>
+                  <div class="legend-text">
+                    <strong>Photosynth (green)</strong>
+                    <span>Generates food from light; efficiency scales with length and is reduced by aggression heat.</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color" data-segment="Loc"></span>
+                  <div class="legend-text">
+                    <strong>Locomotor (blue)</strong>
+                    <span>Pulses periodically to propel the entity; costs food but rewards movement through nutrient-rich areas.</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color" data-segment="Neu"></span>
+                  <div class="legend-text">
+                    <strong>Neural (yellow)</strong>
+                    <span>Senses targets (or nutrient gradients in forage mode) and coordinates all ready locomotor pulses; at rest it aims thrust toward the neural heading, and while moving it blends heading correction with momentum-preserving thrust.</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color" data-segment="Att"></span>
+                  <div class="legend-text">
+                    <strong>Attack (red)</strong>
+                    <span>Deals damage on collision; steals food from targets. Also provides 60% damage reduction when hit.</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color" data-segment="Arm"></span>
+                  <div class="legend-text">
+                    <strong>Armor (gray)</strong>
+                    <span>Provides 90% damage reduction when struck; adds HP and food buffer capacity. Higher metabolic cost.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane pane-callout">
+              <h2>Quick Start</h2>
+              <div class="info-section">
+                <div class="info-item">
+                  <strong>1. Spawn life</strong>
+                  <span>Use the green <strong>1</strong>, <strong>20</strong>, and <strong>50</strong> buttons to spawn new entities, then watch them survive and evolve. Use the <strong>Clear Entities</strong> button to start over with a clean slate.</span>
+                </div>
+                <div class="info-item">
+                  <strong>2. Inspect entities</strong>
+                  <span>Click on any entity to view stats, genome, and relatives.</span>
+                </div>
+                <div class="info-item">
+                  <strong>3. Adjust speed</strong>
+                  <span>Speed things up by clicking <strong>Enable turbo</strong>, or control speed manually with the <strong>Sim steps per frame</strong> and <strong>Sim step time</strong> dropdowns.</span>
+                </div>
+                <div class="info-item">
+                  <strong>4. Sliders &amp; presets</strong>
+                  <span>Open the <strong>Sliders & presets panel</strong> to try one of the settings presets or tune the simulation parameters yourself. Reset to defaults using the <strong><span class="reset-icon-placeholder"></span></strong> buttons.</span>
+                </div>
+                <div class="info-item">
+                  <strong>5. Overlays</strong>
+                  <span>Use <strong>Show nutrient overlay</strong> to show or hide the nutrient field.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane pane-highlighted">
+              <h2>Controls</h2>
+              <div class="info-section controls-info">
+                <div>Click & drag to navigate the world.</div>
+                <div>Scroll wheel or pinch to zoom in/out.</div>
+                <div>Click an entity to select it.</div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Panels & Tools</h2>
+              <div class="info-section">
+                <div class="info-item">
+                  <strong>Status & settings</strong>
+                  <span>Monitor population/performance, control sim speed, spawn entities, and toggle rendering options.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Sliders & presets panel</strong>
+                  <span>Tune the simulation parameters and apply presets.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Automation Panel</strong>
+                  <span>Run preset experiment programs and export census data, screenshots and analysis.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Core Mechanics</h2>
+              <div class="info-section">
+                <div class="info-item">
+                  <strong>HP</strong>
+                  <span>Health is reduced by attacks and starvation; entities die at 0.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Food</strong>
+                  <span>Energy buffer consumed by metabolism and locomotion, replenished by photosynthesis, movement, and attack steals.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Repro</strong>
+                  <span>Surplus food fills the reproductive buffer; full buffer spawns mutated offspring.</span>
+                </div>
+                <div class="info-item">
+                  <strong>World Wrap</strong>
+                  <span>The world wraps at edges; entities leaving one side reappear on the opposite side.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Starvation & Healing</strong>
+                  <span>Food below 25% causes HP loss; above 75% gradually heals HP.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Aggression Heat</strong>
+                  <span>Attacking builds heat that reduces photosynthesis efficiency; decays over time.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Health Bar Legend</h2>
+              <div class="bar-legend">
+                <div class="legend-item"><span class="legend-color" data-bar="hp"></span><span>HP</span></div>
+                <div class="legend-item"><span class="legend-color" data-bar="food"></span><span>Food</span></div>
+                <div class="legend-item"><span class="legend-color" data-bar="repro"></span><span>Repro</span></div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Entity Inspection</h2>
+              <div class="info-section">
+                <div class="info-item">
+                  <strong>Selected Entity Pane</strong>
+                  <span>Shows current HP/Food/Repro, aggression heat, photosynthesis efficiency, age, and generation.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Income Breakdown</strong>
+                  <span>Food Income splits contribution from photosynthesis, locomotion, and attack.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Relatives</strong>
+                  <span>Click a relative thumbnail to jump focus through the lineage tree.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Environment & Nutrients</h2>
+              <div class="info-section">
+                <div class="info-item">
+                  <strong>Nutrient Field</strong>
+                  <span>Affects photosynthesis efficiency and provides food bonus for locomotion through nutrient-rich areas.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Nutrient Consumption</strong>
+                  <span>Photosynthesis and locomotion deplete local nutrients; nutrients regenerate over time.</span>
+                </div>
+                <div class="info-item">
+                  <strong>Nutrient Overlays</strong>
+                  <span>Choose uniform, center-focused, edge-focused, or ring-shaped nutrient distributions.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane">
+              <h2>Genome Format</h2>
+              <div class="info-section genome-info">
+                <div class="genome-example">
+                  <strong>Example</strong>
+                  <code>[sym:3,phase:seq]25.0 0.0 Pho -1 800;18.0 45.0 Loc 0 600 1~[sym:2,mode:mirror]20.0 0.0 Att -1 500;12.0 -30.0 Arm 0 1000</code>
+                </div>
+                <div class="genome-subsection">
+                  <strong>Group Header [ ]</strong>
+                  <div class="genome-detail"><span>sym</span> Number of limbs (1-6, total across all groups)</div>
+                  <div class="genome-detail"><span>mode</span> radial (evenly spaced) or mirror (left/right)</div>
+                  <div class="genome-detail"><span>angles</span> Custom limb angles, e.g. angles:0|90|180</div>
+                  <div class="genome-detail"><span>phase</span> Locomotor timing: sync (simultaneous), seq (sequential), rand (random)</div>
+                  <div class="genome-detail"><span>spread</span> Phase variation for seq/rand (0.00-1.00)</div>
+                </div>
+                <div class="genome-subsection">
+                  <strong>Segments (space-separated, ; between segments)</strong>
+                  <div class="genome-detail"><span>length</span> Segment length (5-50)</div>
+                  <div class="genome-detail"><span>angle</span> Angle from parent segment</div>
+                  <div class="genome-detail"><span>type</span> Pho, Loc, Att, Arm, Neu</div>
+                  <div class="genome-detail"><span>parent</span> -1 = root segment, 0+ = child of segment N</div>
+                  <div class="genome-detail"><span>pulse</span> Pulse interval in ms (120-5000)</div>
+                  <div class="genome-detail"><span>dir</span> Loc/Neu only: +1 or -1 thrust polarity along the segment axis</div>
+                  <div class="genome-detail"><span>behavior</span> Neu only (optional): approach, flee, or forage (default: approach)</div>
+                </div>
+                <div class="genome-subsection">
+                  <strong>Multiple Groups</strong>
+                  <div class="genome-detail">Separate groups with ~ (max 2 segment groups)</div>
+                  <div class="genome-detail">Each group has its own header and segments</div>
+                  <div class="genome-detail">Total limbs across groups cannot exceed 6</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="sliderPanel" class="panel-collapsed">
+          <div class="pane slider-panel-header-pane">
+            <div class="slider-panel-header">
+              <h2>Sliders & presets</h2>
+              <div class="slider-panel-header-actions">
+                <button id="closeSliderPanel" class="close-btn icon-placeholder"></button>
+              </div>
+            </div>
+          </div>
+          <div class="pane slider-preset-pane">
+            <div class="settings-preset-controls">
+              <textarea id="settingsPresetPreview" class="settings-preset-preview" readonly></textarea>
+              <textarea id="settingsPresetDiff" class="settings-preset-preview" readonly></textarea>
+              <div class="settings-preset-select-wrap">
+                <div class="settings-preset-applied">Choose a settings preset:</div>
+                <select id="settingsPresetSelect"></select>
+                <button id="applySettingsPreset">Apply settings preset</button>
+                <div id="settingsPresetApplied" class="settings-preset-applied"></div>
+              </div>
+            </div>
+          </div>
+          <div class="pane slider-panel-pane pane-highlighted">
+            <div class="slider-panel-header">
+              <h2>Slider Panel</h2>
+              <div class="slider-panel-header-actions">
+                <button id="resetAllSliders" class="reset-all-sliders-btn">Reset all</button>
+              </div>
+            </div>
+            <div id="configSliders"></div>
+          </div>
+        </div>
+        <button id="togglePanels" class="status-panel-toggle icon-placeholder" aria-pressed="true" aria-label="Toggle panels"></button>
+        <div id="controlPanel">
+          <div class="pane control-panel-pane">
+          <h2>Status</h2>
+          <div class="status-spacer"></div>
+          <div class="stat-row">
+            <span class="stat-label">Population</span>
+            <span class="stat-value" id="population">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Generation</span>
+            <span class="stat-value" id="generation">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Median age</span>
+            <span class="stat-value" id="medianAge">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Spawn queue</span>
+            <span class="stat-value" id="queued">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Sim time elapsed</span>
+            <span class="stat-value" id="time">0:00</span>
+          </div>
+          <div class="stat-row calc-time-row">
+            <span class="stat-label">Calculation time per frame</span>
+            <span class="stat-value" id="calcTime">0.00 ms</span>
+          </div>
+          <div class="calc-time-bar-container">
+            <div class="calc-time-bar">
+              <div class="calc-time-fill" id="calcTimeFill"></div>
+              <div class="calc-time-ideal" id="calcTimeIdeal"></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Sim steps per frame</span>
+            <span class="stat-value" id="speedMultiplier">1.0x</span>
+          </div>
+          <div class="debug-button-row hidden" id="debugButtonRow">
+            <button id="copyPositioningDebug" type="button">Copy positioning to clipboard</button>
+            <button id="copyRngBenchmarkDebug" type="button">Copy RNG benchmark to clipboard</button>
+            <button id="copyPreviewCanvasesDebug" type="button">Copy preview metadata to clipboard</button>
+            <button id="copyPacingDebug" type="button">Copy pacing debug to clipboard</button>
+          </div>
+          <div class="playback-row">
+            <button id="playPause">Pause</button>
+            <button id="turboSpeed" type="button" aria-pressed="false">Enable turbo</button>
+          </div>
+          <div class="control-select-block">
+            <div class="control-select-row">
+              <label class="control-select-label" for="speed">Sim steps per frame</label>
+              <select id="speed">
+                <option value="1" selected>1x</option>
+                <option value="2">2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+                <option value="16">16x</option>
+                <option value="32">32x</option>
+                <option value="64">64x</option>
+                <option value="128">128x</option>
+                <option value="256">256x</option>
+                <option value="512">512x</option>
+              </select>
+            </div>
+            <div class="control-select-row">
+              <label class="control-select-label" for="simulationTimeScale">Sim step time<span class="help-icon-wrap"><button type="button" class="help-icon" aria-label="Help for Sim step time">?</button><span class="help-tooltip">Larger step times accelerate the sim at the cost of accuracy.</span></span></label>
+              <select id="simulationTimeScale"></select>
+            </div>
+          </div>
+          <button id="toggleInfoPane">Help</button>
+          <button id="toggleSliderPanel">Sliders &amp; presets</button>
+          <div class="automation-button-row">
+            <button id="toggleAutomationPane">Automation</button>
+            <span id="automationButtonProgress" class="automation-button-progress hidden"></span>
+          </div>
+          <div class="overlay-channel-control"> 
+            <div class="overlay-channel-labels">
+              <div class="overlay-channel-label">Nutrient overlay</div>
+              <div class="overlay-select-label">Overlay shape</div>
+            </div>
+            <div id="environmentOverlayToggle" class="overlay-channel-toggle" role="group">
+              <button type="button" data-overlay-channel="nutrient" aria-pressed="false">Show nutrient overlay</button>
+              <select id="nutrientFieldType" class="overlay-channel-select"></select>
+            </div>
+          </div>
+          <div class="spawn-controls">
+            <div class="spawn-seed-row">
+              <label for="spawnInitialSeed" class="spawn-seed-label">Initial seed</label>
+              <div class="spawn-seed-input-wrap">
+                <input id="spawnInitialSeed" class="spawn-seed-input" type="text" placeholder="random" spellcheck="false">
+                <button type="button" class="spawn-seed-clear hidden" aria-label="Clear initial seed">&times;</button>
+              </div>
+            </div>
+            <div class="spawn-seed-row">
+              <label for="spawnEvolutionSeed" class="spawn-seed-label">Evolution seed</label>
+              <div class="spawn-seed-input-wrap">
+                <input id="spawnEvolutionSeed" class="spawn-seed-input" type="text" placeholder="random" spellcheck="false">
+                <button type="button" class="spawn-seed-clear hidden" aria-label="Clear evolution seed">&times;</button>
+              </div>
+            </div>
+            <div class="spawn-toggle-row">
+              <span class="spawn-toggle-label">Toggle segment types</span>
+              <div class="spawn-toggle-buttons" id="segmentTypeToggles"></div>
+            </div>
+            <div class="spawn-header-row">
+              <div class="spawn-random-controls">
+                <span class="spawn-random-label">Add entities</span>
+                <div class="spawn-random-buttons">
+                  <button type="button" data-spawn-count="1" data-spawn-config-index="0">1</button>
+                  <button type="button" data-spawn-count="20" data-spawn-config-index="0">20</button>
+                  <button type="button" class="spawn-button-large" data-spawn-count="50" data-spawn-config-index="0">50</button>
+                </div>
+              </div>
+              <div class="clear-entities-wrap">
+                <div id="clearAllTooltip" class="clear-tooltip hidden" role="dialog" aria-live="polite">
+                  <span>Clear entities?</span>
+                  <button id="clearAllConfirm" class="danger">Confirm</button>
+                </div>
+                <button id="clearAll" class="danger">Clear entities</button>
+              </div>
+            </div>
+            <div id="spawnConfigGrid" class="spawn-grid"></div>
+          </div>
+        </div>
+        
+        <div class="pane pane-highlighted">
+          <div class="pane-header-row">
+            <h2>Settings</h2>
+            <button id="resetSettingsPane" class="pane-reset-btn">Reset all</button>
+          </div>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="showHealthbars"> Show health bars</label>
+            <label><input type="checkbox" id="showGrid"> Show grid lines</label>
+            <label><input type="checkbox" id="showNeuralAndLocomotorActivity"> Show neural and locomotor activity</label>
+            <label><input type="checkbox" id="showEnvironmentFootprintDebug"> Show selected footprint radius</label>
+            <label><input type="checkbox" id="disableFlashEffects"> Disable flash effects</label>
+            <label><input type="checkbox" id="familyNonAggression" checked> Family non-aggression</label>
+          </div>
+          <div class="control-select-block">
+            <div class="control-select-row">
+              <label class="control-select-label" for="worldSize">World size</label>
+              <select id="worldSize"></select>
+            </div>
+            <div class="control-select-row">
+              <label class="control-select-label" for="environmentCellSize">Nutrient cell size</label>
+              <select id="environmentCellSize"></select>
+            </div>
+            <div class="control-select-row">
+              <label class="control-select-label" for="cullingStrategy">Culling preference</label>
+              <select id="cullingStrategy"></select>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="selectedEntity" class="floating-pane hidden">
+      <div class="selected-entity-content">
+        <div class="entity-main">
+        <button id="closeSelectedEntity" class="close-btn entity-close-btn icon-placeholder" title="Close"></button>
+        <div class="entity-main-row">
+          <div class="entity-primary-column">
+            <div class="entity-primary-top">
+              <div id="entityStats"></div>
+              <div class="entity-preview-column">
+                <div id="entityName" class="entity-name"></div>
+                <canvas id="entityPreview" class="entity-preview"></canvas>
+              </div>
+            </div>
+            <textarea id="entityGenome" class="entity-genome settings-preset-preview" rows="3" readonly></textarea>
+          </div>
+          <div id="entityIncome"></div>
+        </div>
+      </div>
+      <div class="entity-side">
+        <div id="entityFamily" class="entity-family"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (target instanceof HTMLElement && target.classList.contains('help-icon')) {
+        const tooltip = target.nextElementSibling;
+        if (tooltip instanceof HTMLElement) {
+          tooltip.classList.toggle('open');
+        }
+        e.stopPropagation();
+        return;
+      }
+      document.querySelectorAll('.help-tooltip.open').forEach((t) => {
+        t.classList.remove('open');
+      });
+    });
+  </script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

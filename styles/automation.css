@@ -1,0 +1,233 @@
+/* eslint-disable css/no-invalid-properties */
+
+#automationPanel {
+  width: var(--automation-panel-width);
+  min-width: var(--automation-panel-width);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+#automationPanel.panel-collapsed {
+  display: none;
+}
+
+.automation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.automation-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-subtle);
+}
+
+.automation-content {
+  padding: 4px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.automation-section {
+  flex-shrink: 0;
+}
+
+.automation-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  letter-spacing: 0.35px;
+}
+
+.automation-section select {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.preset-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.preset-summary {
+  background: var(--bg-app);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.automation-preset-preview {
+  min-height: 152px;
+  height: 152px;
+  max-height: 152px;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  border-radius: var(--radius-sm);
+  height: 100%;
+  background: #4488ff;
+  transition: width 0.3s ease;
+}
+
+.progress-text-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.current-experiment-info {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--bg-app);
+  border-radius: var(--radius-sm);
+}
+
+.experiment-detail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.experiment-detail:last-child {
+  margin-bottom: 0;
+}
+
+.experiment-detail span:first-child {
+  color: var(--text-faint);
+}
+
+.experiment-detail span:last-child {
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.download-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.download-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 110px;
+}
+
+.download-ext {
+  color: var(--text-special-dim);
+  font-size: 11px;
+}
+
+.download-row button {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.download-row button .btn-text {
+  color: var(--text-base);
+}
+
+.download-row button .btn-count {
+  color: var(--text-subtle);
+  font-size: 11px;
+}
+
+.download-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.download-row button:disabled .btn-text,
+.download-row button:disabled .btn-count {
+  color: var(--text-special-dim);
+}
+
+.download-all-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  font-weight: 600;
+  background: #2a4a7a;
+  border-color: #3a5a8a;
+  color: var(--text-base);
+}
+
+.download-all-btn:hover {
+  background: #3a5a9a;
+}
+
+.download-all-btn:disabled {
+  background: var(--bg-control);
+  border-color: var(--border-control);
+  color: var(--text-special-dim);
+  cursor: not-allowed;
+}
+
+.download-progress {
+  margin-top: 12px;
+}
+
+.download-progress-fill {
+  border-radius: var(--radius-sm);
+  height: 100%;
+  background: #4488ff;
+  transition: width 0.15s ease;
+  width: 0%;
+}
+
+.download-progress-text {
+  font-size: 11px;
+  color: var(--text-subtle);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.automation-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.automation-actions button {
+  flex: 1;
+  padding: 10px;
+  font-weight: 400;
+}
