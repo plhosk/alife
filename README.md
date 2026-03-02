@@ -6,6 +6,8 @@ Browser-based artificial life simulation built with TypeScript and Vite. Entitie
 
 https://plhosk.github.io/alife/
 
+![A-Life screenshot](./screenshot1.png)
+
 ## What it does
 
 - Simulates populations of autonomous entities in a wrapped 2D world.

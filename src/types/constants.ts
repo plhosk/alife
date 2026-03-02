@@ -3,8 +3,8 @@ import { SegmentType } from './models';
 export const GENOME_LIMITS_CONSTANTS = {
   maxLimbGroups: 2,
   maxTotalLimbs: 6,
-  genomeBaseSegmentBudget: 16,
-  genomeSymmetrySegmentBonus: 2,
+  genomeBaseSegmentBudget: 20,
+  genomeSymmetrySegmentBonus: 6,
   minSegmentLength: 5,
   maxSegmentLength: 50,
   minPulseIntervalMs: 120,
