@@ -16,9 +16,18 @@ https://plhosk.github.io/alife/
 - Includes automation presets for running reproducible experiment batches.
 - Exports results, census logs, mosaics, screenshots, and analysis artifacts.
 
-## Quick start
+## Controls at a glance
+
+- Click and drag to pan; scroll/pinch to zoom.
+- Click an entity to inspect stats, genome, and relatives.
+- Use **Enable turbo**, **Sim steps per frame**, and **Sim step time** to change simulation speed.
+- Use **Sliders & presets** and **Automation** for tuning and batch runs.
+
+## Run locally
 
 ```bash
+git clone https://github.com/plhosk/alife
+cd alife
 npm install
 npm run dev
 ```
@@ -31,10 +40,3 @@ Open the local Vite URL, spawn entities, and adjust controls from the right-side
 - `npm run check` - Run TypeScript and ESLint checks.
 - `npm run build` - Create a production build.
 - `npm run preview` - Serve the production build locally.
-
-## Controls at a glance
-
-- Click and drag to pan; scroll/pinch to zoom.
-- Click an entity to inspect stats, genome, and relatives.
-- Use **Enable turbo**, **Sim steps per frame**, and **Sim step time** to change simulation speed.
-- Use **Sliders & presets** and **Automation** for tuning and batch runs.
